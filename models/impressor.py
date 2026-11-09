@@ -10,10 +10,17 @@ class Impressor(Usuario):
 
     @property
     def lista_pedido(self):
-        return self.__pedidos_assumidos
+        return self.__pedidos_assumidos.copy()
+    @property
+    def lista_concluido(self):
+        return self.__pedidos_concluidos.copy()
    
-    def assumir_pedido(self, pedido):
-        self.__pedidos_assumidos.append(pedido)
+    def assumir_pedido(self, novo_pedido):
+        for pedido_na_fila in self.__pedidos_assumidos:
+            if pedido_na_fila.get_id_pedido() == novo_pedido.get_id_pedido():
+                raise ValueError("Esse pedido já está na lista de produção.")
+
+        self.__pedidos_assumidos.append(novo_pedido)
         print("O pedido foi adicionado à fila de produção de {}.".format(self.get_nome()))
 
     def concluir_pedido(self, id_pedido):
@@ -31,8 +38,8 @@ class Impressor(Usuario):
 # PAINEL DE INFORMAÇÕES 
 
     def exibir_fila_producao(self):
-        if len(self.lista_pedido()) > 0:
-            print("--- Os lista_pedido em produção são: ---")
+        if len(self.lista_pedido) > 0:
+            print("--- Os pedidos em produção são: ---")
             for pedido in self.lista_pedido: 
                 print(f"• Pedido #{pedido.get_id_pedido()} | Status: {pedido.get_status()}")
 
@@ -42,7 +49,7 @@ class Impressor(Usuario):
     def exibir_opcoes(self):
         print("-" * 45)
         print("Opções:")
-        print("1. Buscar novos lista_pedido no mercado")
+        print("1. Buscar novos pedidos no mercado")
         print("2. Concluir um trabalho da fila")
         print("0. Desconectar")
         print("=" * 45)
