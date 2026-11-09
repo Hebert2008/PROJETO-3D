@@ -44,7 +44,19 @@ class Usuario(ABC):
         else:
             raise ValueError("Senha inválida. A senha deve ter pelo menos 6 caracteres.")
 
-    #MÉTODO ABSTRATO:
+
+    #PAINEL:
+
+    def exibir_user_info(self):
+        print("\n" + "=" * 45)
+        print(f"  USUÁRIO: {self.get_nome().upper()}")
+        print("=" * 45)
+        print(f"E-mail: {self.get_email()}")
+
+    @abstractmethod
+    def exibir_opcoes(self):
+        pass
+
     @abstractmethod
     def exibir_painel(self):
         pass
