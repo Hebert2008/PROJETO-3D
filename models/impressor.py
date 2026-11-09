@@ -51,14 +51,14 @@ class Impressor(Usuario):
         print("Opções:")
         print("1. Buscar novos pedidos no mercado")
         print("2. Concluir um trabalho da fila")
-        print("0. Desconectar")
+        print("3. Desconectar")
         print("=" * 45)
 
 
 
     def exibir_painel(self):
         print(f"\n--- PAINEL DO IMPRESSOR: {self.get_nome()} ---")
-        self.exibir_cabecalho()       
+        self.exibir_user_info()       
         self.exibir_fila_producao()   
         self.exibir_opcoes()
 
