@@ -6,22 +6,16 @@ class Impressor(Usuario):
         
         # Atributos focados na jornada do negócio
         self.__pedidos_assumidos = []
-        self.__reputacao = 5.0
 
- 
-    def get_pedidos_assumidos(self):
+    @property
+    def pedidos(self):
         return self.__pedidos_assumidos
-
-    def get_reputacao(self):
-        return self.__reputacao
-
    
     def assumir_pedido(self, pedido):
         self.__pedidos_assumidos.append(pedido)
-        
         print("O pedido foi adicionado à fila de produção de {}.".format(self.get_nome()))
 
-    def concluir_trabalho(self, id_pedido):
+    def concluir_pedido(self, id_pedido):
         
         for pedido in self.__pedidos_assumidos:
             if pedido.get_id_pedido() == id_pedido:
@@ -30,6 +24,9 @@ class Impressor(Usuario):
                 return
                 
         raise ValueError("Pedido não encontrado na sua lista de assumidos.")
+
+
+# PAINEL DE INFORMAÇÕES 
 
 
     def exibir_painel(self):
