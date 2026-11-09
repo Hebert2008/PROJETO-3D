@@ -6,9 +6,10 @@ class Impressor(Usuario):
         
         # Atributos focados na jornada do negócio
         self.__pedidos_assumidos = []
+        self.__pedidos_concluidos = []
 
     @property
-    def pedidos(self):
+    def lista_pedido(self):
         return self.__pedidos_assumidos
    
     def assumir_pedido(self, pedido):
@@ -16,10 +17,11 @@ class Impressor(Usuario):
         print("O pedido foi adicionado à fila de produção de {}.".format(self.get_nome()))
 
     def concluir_pedido(self, id_pedido):
-        
         for pedido in self.__pedidos_assumidos:
             if pedido.get_id_pedido() == id_pedido:
                 self.__pedidos_assumidos.remove(pedido)
+                self.__pedidos_concluidos.append(pedido)
+
                 print(f"Trabalho {id_pedido} concluído e removido da sua fila.")
                 return
                 
@@ -28,7 +30,29 @@ class Impressor(Usuario):
 
 # PAINEL DE INFORMAÇÕES 
 
+    def exibir_fila_producao(self):
+        if len(self.lista_pedido()) > 0:
+            print("--- Os lista_pedido em produção são: ---")
+            for pedido in self.lista_pedido: 
+                print(f"• Pedido #{pedido.get_id_pedido()} | Status: {pedido.get_status()}")
+
+        else: 
+            print("Fila de produção vazia!")
+
+    def exibir_opcoes(self):
+        print("-" * 45)
+        print("Opções:")
+        print("1. Buscar novos lista_pedido no mercado")
+        print("2. Concluir um trabalho da fila")
+        print("0. Desconectar")
+        print("=" * 45)
+
+
 
     def exibir_painel(self):
         print(f"\n--- PAINEL DO IMPRESSOR: {self.get_nome()} ---")
+        self.exibir_cabecalho()       
+        self.exibir_fila_producao()   
+        self.exibir_opcoes()
+
         
