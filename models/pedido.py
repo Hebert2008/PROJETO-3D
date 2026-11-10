@@ -2,12 +2,12 @@ class Pedido:
     # Contador estático começando em 0, conforme sua lógica
     __contador_id = 0
 
-    def __init__(self, descricao, quantidade, valor, link_modelo_3d):
-        # Pré-incremento: soma 1 ao contador global primeiro, depois atribui
-        Pedido.__contador_id += 1
+    def __init__(self, id_pedido, link_modelo_3d,descricao, quantidade, valor, status="Aberto"):        # Pré-incremento: soma 1 ao contador global primeiro, depois atribui
         self.__id_pedido = Pedido.__contador_id
         
         # O uso do 'self.' sem o '__' aqui chama os setters do @property automaticamente
+        self.__id_pedido = id_pedido
+        
         self.descricao = descricao
         self.quantidade = quantidade
         self.valor = valor
