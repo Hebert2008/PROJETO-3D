@@ -1,67 +1,71 @@
+from models.usuario import Usuario
 
-class Pedido:
-    def __init__(self, id_pedido, descricao, quantidade, valor, status="Aberto"):
-        # O ID agora vem do banco de dados (AUTOINCREMENT) e continua protegido (sem setter)
-        self.__id_pedido = id_pedido
-        
-        # Chama os setters do @property para garantir validação mesmo vindo do banco
-        self.descricao = descricao
-        self.quantidade = quantidade
-        self.valor = valor
-        self.status = status
+class Impressor(Usuario):
+    def __init__(self, id_usuario, nome, email, senha):
+        super().__init__(id_usuario, nome, email, senha)
+        self.__pedidos_assumidos = []
+        self.__pedidos_concluidos = []
 
     @property
-    def id_pedido(self):
-        return self.__id_pedido
+    def lista_pedido(self):
+        return self.__pedidos_assumidos.copy()
+
+    @property
+    def lista_concluido(self):
+        return self.__pedidos_concluidos.copy()
 
     # ==========================================
-    # GETTERS E SETTERS (Mantidos intactos)
+    # INTEGRAÇÃO COM BANCO DE DADOS
     # ==========================================
-    @property
-    def descricao(self):
-        return self.__descricao
+    def carregar_pedido_banco(self, pedido):
+        """Preenche as listas silenciosamente ao buscar dados do SQLite."""
+        if pedido.status == "Em Produção":
+            self.__pedidos_assumidos.append(pedido)
+        elif pedido.status == "Finalizado":
+            self.__pedidos_concluidos.append(pedido)
+   
+    # ==========================================
+    # MÉTODOS DE NEGÓCIO
+    # ==========================================
+    def assumir_pedido(self, novo_pedido):
+        """Usado apenas quando o usuário ativamente puxa um pedido no terminal."""
+        for pedido_na_fila in self.__pedidos_assumidos:
+            if pedido_na_fila.id_pedido == novo_pedido.id_pedido:
+                raise ValueError("Esse pedido já está na lista de produção.")
 
-    @descricao.setter
-    def descricao(self, descricao):
-        if len(descricao.strip()) > 0:
-            self.__descricao = descricao
-        else:
-            raise ValueError("A descrição/modelo não pode ser vazia.")
+        self.__pedidos_assumidos.append(novo_pedido)
+        print(f"Pedido #{novo_pedido.id_pedido} adicionado à fila de {self.get_nome()}.")
 
-    @property
-    def quantidade(self):
-        return self.__quantidade
+    def concluir_pedido(self, id_pedido):
+        for pedido in self.__pedidos_assumidos:
+            if pedido.id_pedido == id_pedido:
+                self.__pedidos_assumidos.remove(pedido)
+                self.__pedidos_concluidos.append(pedido)
+                print(f"Trabalho {id_pedido} concluído e removido da sua fila.")
+                return
+        raise ValueError("Pedido não encontrado na sua lista de assumidos.")
 
-    @quantidade.setter
-    def quantidade(self, quantidade):
-        if quantidade > 0:
-            self.__quantidade = quantidade
-        else:
-            raise ValueError("A quantidade deve ser maior que zero.")
+    # ==========================================
+    # PAINEL DE INFORMAÇÕES 
+    # ==========================================
+    def exibir_fila_producao(self):
+        if len(self.lista_pedido) > 0:
+            print("--- Fila de Produção: ---")
+            for pedido in self.lista_pedido: 
+                print(f"• Pedido #{pedido.id_pedido} | Status: {pedido.status}")
+        else: 
+            print("Fila de produção vazia!")
 
-    @property
-    def valor(self):
-        return self.__valor
+    def exibir_opcoes(self):
+        print("-" * 45)
+        print("Opções:")
+        print("1. Buscar novos pedidos no mercado")
+        print("2. Concluir um trabalho da fila")
+        print("0. Desconectar")
+        print("=" * 45)
 
-    @valor.setter
-    def valor(self, valor):
-        if valor > 0:
-            self.__valor = valor
-        else:
-            raise ValueError("O valor deve ser maior que zero.")
-
-    @property
-    def status(self):
-        return self.__status
-
-    @status.setter
-    def status(self, novo_status):
-        status_validos = ["Aberto", "Em Produção", "Finalizado", "Cancelado"]
-        if novo_status in status_validos:
-            self.__status = novo_status
-        else:
-            raise ValueError(f"Status inválido! Escolha entre: {status_validos}")
-
-    def exibir_detalhes(self):
-        print(f"• Pedido #{self.id_pedido} | Peça: {self.descricao} | "
-              f"Qtd: {self.quantidade} | R$ {self.valor:.2f} | Status: {self.status}")
+    def exibir_painel(self):
+        print(f"\n--- PAINEL DO IMPRESSOR: {self.get_nome()} ---")
+        self.exibir_user_info()       
+        self.exibir_fila_producao()   
+        self.exibir_opcoes()

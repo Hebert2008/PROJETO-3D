@@ -67,6 +67,6 @@ class Solicitante(Usuario):
 
     def exibir_painel(self):
         print(f"\n--- PAINEL DO SOLICITANTE: {self.get_nome()} ---")
-        self.exibir_cabecalho()       
+        self.exibir_user_info()       
         self.exibir_lista_pedidos()   
         self.exibir_opcoes()
