@@ -29,17 +29,18 @@ class Usuario(ABC):
         return self.__email
 
     def set_email(self, novo_email):
-        if "@" in novo_email and "." in novo_email and len(novo_email) > 0:
+        # Trocamos o "." genérico pela exigência do ".com"
+        if "@" in novo_email and ".com" in novo_email and len(novo_email.strip()) > 0:
             self.__email = novo_email
         else:
-            raise ValueError("Email inválido.")
+            raise ValueError("E-mail inválido. O e-mail deve conter '@' e '.com'.")
         
     #MÉTODO SENHA:
     def get_senha(self):
         return self.__senha
 
-    def set_senha (self, nova_senha):
-        if len(nova_senha) >= 6:
+    def set_senha(self, nova_senha):
+        if len(nova_senha.strip()) >= 6:
             self.__senha = nova_senha
         else:
             raise ValueError("Senha inválida. A senha deve ter pelo menos 6 caracteres.")

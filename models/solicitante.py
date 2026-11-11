@@ -19,11 +19,12 @@ class Solicitante(Usuario):
     # ==========================================
     def carregar_pedido_banco(self, pedido):
         """Preenche as listas silenciosamente ao buscar dados do SQLite."""
-        if pedido.status in ["Finalizado", "Cancelado"]:
+        # Acesse a propriedade pedido.status diretamente
+        if pedido.status in ["Finalizado", "Cancelado", "Arquivado"]:
             self.__pedidos_historico.append(pedido)
         else:
             self.__pedidos_ativos.append(pedido)
-
+            
     # ==========================================
     # MÉTODOS DE NEGÓCIO
     # ==========================================
@@ -54,20 +55,24 @@ class Solicitante(Usuario):
             if pedido.id_pedido == id_pedido:
                 if pedido.status == "Aberto":
                     pedido.status = "Cancelado"
-                    print(f"Pedido #{id_pedido} cancelado com sucesso! Agora você pode arquivá-lo.")
+                    
+                    # 1. Tira da lista ativa na mesma hora
+                    self.__pedidos_ativos.remove(pedido)
+                    
+                    # 2. Guarda na gaveta permanente
+                    self.__pedidos_historico.append(pedido)
+                    
+                    print(f"Pedido #{id_pedido} cancelado e movido para o histórico!")
                     return
                 else:
                     raise ValueError(f"Cancelamento negado: O pedido já está {pedido.status}.")
         raise ValueError("Pedido não encontrado na sua lista de ativos.")
 
-    # Atualize o seu menu de opções para incluir o Cancelar
- # Atualize o seu menu de opções para incluir o Cancelar
     def exibir_opcoes(self):
         print("-" * 45)
         print("Opções:")
         print("1. Criar um novo pedido no mercado") # A quebra de aspas estava aqui
-        print("2. Finalizar/Arquivar um pedido da lista")
-        print("3. Cancelar um pedido em aberto")
+        print("2. Cancelar um pedido em aberto")
         print("0. Desconectar")
         print("=" * 45)
 
@@ -80,7 +85,8 @@ class Solicitante(Usuario):
         if len(pedidos) > 0:
             print("--- Seus pedidos ativos são: ---")
             for pedido in pedidos:
-                print(f"• Pedido #{pedido.id_pedido} | Status: {pedido.status}")
+                # Substitua o print antigo por este completo:
+                print(f"• Pedido #{pedido.id_pedido} | Item: {pedido.descricao} | Qtd: {pedido.quantidade} un. | Valor: R$ {pedido.valor:.2f} | Status: {pedido.status}")
         else:
             print("Lista de pedidos ativos vazia!")
             

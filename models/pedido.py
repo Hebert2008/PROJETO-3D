@@ -3,16 +3,15 @@ class Pedido:
     # Contador estático começando em 0, conforme sua lógica
     __contador_id = 0
 
-    def __init__(self, id_pedido,descricao, quantidade, valor, status="Aberto"):        # Pré-incremento: soma 1 ao contador global primeiro, depois atribui
-        self.__id_pedido = Pedido.__contador_id
-        
-        # O uso do 'self.' sem o '__' aqui chama os setters do @property automaticamente
+class Pedido:
+    # Adicione o status="Aberto" no final dos parâmetros
+    def __init__(self, id_pedido, descricao, quantidade, valor, status="Aberto"):
         self.__id_pedido = id_pedido
+        self.__descricao = descricao
+        self.__quantidade = quantidade
+        self.__valor = valor
         
-        self.descricao = descricao
-        self.quantidade = quantidade
-        self.valor = valor
-        self.status = "Aberto"
+        self.__status = status
 
     # IMUTABILIDADE DO ID (Apenas Getter)
     @property
@@ -32,17 +31,6 @@ class Pedido:
             self.__descricao = descricao
         else:
             raise ValueError("A descrição/modelo do pedido não pode ser vazia.")
-
-    @property
-    def link_modelo_3d(self):
-        return self.__link_modelo_3d
-
-    @link_modelo_3d.setter
-    def link_modelo_3d(self, link_modelo_3d):
-        if len(link_modelo_3d.strip()) > 0:
-            self.__link_modelo_3d = link_modelo_3d
-        else:
-            raise ValueError("O link do modelo não pode estar vazio.")
     
     @property
     def quantidade(self):

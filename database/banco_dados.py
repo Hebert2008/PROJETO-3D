@@ -51,6 +51,8 @@ class BancoDeDados:
         except sqlite3.IntegrityError:
             raise ValueError("Erro: Já existe um usuário cadastrado com este e-mail.")
 
+    
+
     def inserir_pedido(self, descricao, quantidade, valor, id_solicitante):
         self.__cursor.execute('''
             INSERT INTO pedidos (descricao, quantidade, valor, status, id_solicitante) 
