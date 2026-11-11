@@ -49,24 +49,39 @@ class Solicitante(Usuario):
     # ==========================================
     # PAINEL DE INFORMAÇÕES
     # ==========================================
-    def exibir_lista_pedidos(self):
-        if len(self.lista_pedido) > 0:
-            print("--- Seus pedidos ativos são: ---")
-            for pedido in self.lista_pedido:
-                print(f"• Pedido #{pedido.id_pedido} | Status: {pedido.status}")
-        else:
-            print("Lista de pedidos ativos vazia!")
+    def cancelar_pedido(self, id_pedido):
+        for pedido in self.__pedidos_ativos:
+            if pedido.id_pedido == id_pedido:
+                if pedido.status == "Aberto":
+                    pedido.status = "Cancelado"
+                    print(f"Pedido #{id_pedido} cancelado com sucesso! Agora você pode arquivá-lo.")
+                    return
+                else:
+                    raise ValueError(f"Cancelamento negado: O pedido já está {pedido.status}.")
+        raise ValueError("Pedido não encontrado na sua lista de ativos.")
 
+    # Atualize o seu menu de opções para incluir o Cancelar
+ # Atualize o seu menu de opções para incluir o Cancelar
     def exibir_opcoes(self):
         print("-" * 45)
         print("Opções:")
-        print("1. Criar um novo pedido no mercado")
+        print("1. Criar um novo pedido no mercado") # A quebra de aspas estava aqui
         print("2. Finalizar/Arquivar um pedido da lista")
+        print("3. Cancelar um pedido em aberto")
         print("0. Desconectar")
         print("=" * 45)
 
     def exibir_painel(self):
         print(f"\n--- PAINEL DO SOLICITANTE: {self.get_nome()} ---")
         self.exibir_user_info()       
-        self.exibir_lista_pedidos()   
+        
+        # Lógica para imprimir a lista em vez de apenas chamá-la
+        pedidos = self.lista_pedido
+        if len(pedidos) > 0:
+            print("--- Seus pedidos ativos são: ---")
+            for pedido in pedidos:
+                print(f"• Pedido #{pedido.id_pedido} | Status: {pedido.status}")
+        else:
+            print("Lista de pedidos ativos vazia!")
+            
         self.exibir_opcoes()

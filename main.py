@@ -41,7 +41,9 @@ def carregar_sessao_impressor(db, id_usuario):
 def fluxo_solicitante(usuario, db):
     while True:
         usuario.exibir_painel()
-        opcao = input("\nEscolha uma opção (0 a 2): ")
+        
+        # APENAS UM INPUT AQUI (Já atualizado para 0 a 3)
+        opcao = input("\nEscolha uma opção (0 a 3): ")
 
         if opcao == "1":
             print("\n--- NOVO PEDIDO ---")
@@ -63,62 +65,73 @@ def fluxo_solicitante(usuario, db):
             id_arq = int(input("\nInforme o ID do pedido para arquivar (Finalizado/Cancelado): "))
             try:
                 usuario.finalizar_pedido(id_arq)
-                # Atualiza no banco (opicional dependendo da sua regra de histórico)
                 db.atualizar_status_pedido(id_arq, None, "Arquivado")
+            except ValueError as erro:
+                print(f"[!] Erro: {erro}")
+
+        elif opcao == "3":
+            id_canc = int(input("\nInforme o ID do pedido para cancelar: "))
+            try:
+                # 1. Tenta cancelar o objeto localmente
+                usuario.cancelar_pedido(id_canc)
+                # 2. Se não deu erro, atualiza no banco
+                db.atualizar_status_pedido(id_canc, None, "Cancelado")
             except ValueError as erro:
                 print(f"[!] Erro: {erro}")
 
         elif opcao == "0":
             print("Desconectando Solicitante...")
             break
+        
         else:
             print("Opção inválida.")
+    
 
-def fluxo_impressor(usuario, db):
+def fluxo_solicitante(usuario, db):
     while True:
         usuario.exibir_painel()
-        opcao = input("\nEscolha uma opção (0 a 2): ")
+        
+        # APENAS UM INPUT AQUI (Já atualizado para 0 a 3)
+        opcao = input("\nEscolha uma opção (0 a 3): ")
 
         if opcao == "1":
-            print("\n--- MERCADO DE PEDIDOS ABERTOS ---")
-            pedidos_abertos = db.buscar_pedidos_abertos()
+            print("\n--- NOVO PEDIDO ---")
+            descricao = input("O que deseja imprimir? ")
+            qtd = int(input("Quantidade de peças: "))
+            valor = float(input("Valor sugerido (R$): "))
             
-            if not pedidos_abertos:
-                print("Não há pedidos abertos no mercado no momento.")
-            else:
-                for linha in pedidos_abertos:
-                    print(f"• Pedido #{linha[0]} | Peça: {linha[1]} | Qtd: {linha[2]} | R$ {linha[3]:.2f}")
-                
-                id_assumir = int(input("\nDigite o ID do pedido que deseja assumir: "))
-                
-                # Encontra os dados daquele ID na lista buscada do banco
-                dados_pedido = next((p for p in pedidos_abertos if p[0] == id_assumir), None)
-                
-                if dados_pedido:
-                    # 1. Atualiza no banco
-                    db.atualizar_status_pedido(id_assumir, usuario.get_id(), "Em Produção")
-                    # 2. Cria o objeto e vincula localmente
-                    pedido_assumido = Pedido(dados_pedido[0], dados_pedido[1], dados_pedido[2], dados_pedido[3], "Em Produção")
-                    try:
-                        usuario.assumir_pedido(pedido_assumido)
-                    except ValueError as erro:
-                        print(f"[!] Erro: {erro}")
-                else:
-                    print("ID inválido ou pedido não está mais aberto.")
+            try:
+                # 1. Salva no banco de dados primeiro
+                id_gerado = db.inserir_pedido(descricao, qtd, valor, usuario.get_id())
+                # 2. Cria o objeto Pedido com o ID real do banco
+                novo_pedido = Pedido(id_gerado, descricao, qtd, valor)
+                # 3. Adiciona à lista local da classe
+                usuario.novo_pedido(novo_pedido)
+            except ValueError as erro:
+                print(f"[!] Erro ao criar pedido: {erro}")
 
         elif opcao == "2":
-            id_conc = int(input("\nInforme o ID do trabalho para concluir: "))
+            id_arq = int(input("\nInforme o ID do pedido para arquivar (Finalizado/Cancelado): "))
             try:
-                # 1. Conclui localmente
-                usuario.concluir_pedido(id_conc)
-                # 2. Atualiza no banco para o solicitante poder ver
-                db.atualizar_status_pedido(id_conc, usuario.get_id(), "Finalizado")
+                usuario.finalizar_pedido(id_arq)
+                db.atualizar_status_pedido(id_arq, None, "Arquivado")
+            except ValueError as erro:
+                print(f"[!] Erro: {erro}")
+
+        elif opcao == "3":
+            id_canc = int(input("\nInforme o ID do pedido para cancelar: "))
+            try:
+                # 1. Tenta cancelar o objeto localmente
+                usuario.cancelar_pedido(id_canc)
+                # 2. Se não deu erro, atualiza no banco
+                db.atualizar_status_pedido(id_canc, None, "Cancelado")
             except ValueError as erro:
                 print(f"[!] Erro: {erro}")
 
         elif opcao == "0":
-            print("Desconectando Impressor...")
+            print("Desconectando Solicitante...")
             break
+        
         else:
             print("Opção inválida.")
 
